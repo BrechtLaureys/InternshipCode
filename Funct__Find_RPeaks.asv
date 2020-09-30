@@ -15,25 +15,28 @@ plot(EEG.times/1000, ECG); %change from ms to s
 hold on; plot(R_latency/EEG.srate,valueRpeak,'xr'); %change from srate to s
 
 % Remove data if bad R-peaks
-ask_rem = menu('Remove datasegments with bad R-peaks using EEGLAB?','Yes','No');
+ask_rem = menu('Remove data with bad R-peaks using EEGLAB?','Yes','No');
 close(gcf)
 
 if ask_rem == 1
     while ask_rem == 1
      
-                % Open EEGLAB to reject
-        eeglab redraw;pop_eegplot(EEG);
-        
         % Show the name under which to save data
-        text1 = sprintf(['Reject bad datasegments and save data manually in EEGLAB using the filename: \n"' remove_file '"\n\nDone? Click OK']);
+%         input(['\n After removal, save data manually using the filename: ' remove_file]);
+        text1 = sprintf(['\n After removal, save data manually using the filename: ' remove_file]);
         waitfor(msgbox(text1));
         
+        % Open EEGLAB to reject
+        eeglab redraw;pop_eegplot(EEG);
+        
         % Use rejected data?
-        stop_rem = menu('Did you remove data?','Yes','No');
+        input('Press to continue');
+        stop_rem = input('Did you remove data?(0=no/1=yes)');
+                    stop_rem = menu('Remove further data?','Yes','No');
 
         
         % Continue with original data
-        if stop_rem == 2
+        if stop_rem == 0
             break;
         end
         
@@ -52,7 +55,7 @@ if ask_rem == 1
             
             %Remove further data?
             ask_rem = menu('Remove further data?','Yes','No');
-            close all;
+            close(gcf)
         end
     end
 end

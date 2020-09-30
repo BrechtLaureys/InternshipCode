@@ -1,7 +1,7 @@
 %% Basic variables
 map = 'C:\Users\brech\OneDrive\Documenten\Ugent\EXAMPLE__UNFOLD_LaserHEP'; %Change to your map
 cd 'C:\Users\brech\OneDrive\Documenten\Ugent\EXAMPLE__UNFOLD_LaserHEP' %Change to your map
-sub_list = [1:10];
+sub_list = [1:2];
 
 %% Load data
 for i_sub = sub_list % Load seperate data in single dataset
@@ -12,10 +12,11 @@ EEG_start(i_sub) = EEG;
 end
 
 %% Identify R-peak latencies
-for i_sub = sub_list 
+for i_sub = sub_list
 i_string = num2str(i_sub);
 
-[EEG_Rpeaks(i_sub)] = Funct__Find_RPeaks(EEG_start(i_sub), 32, map, ['remove' i_string '.set']);
+EEG = EEG_start(i_sub)
+[EEG_Rpeaks(i_sub)] = Funct__Find_RPeaks(EEG, 32, map, ['remove' i_string '.set']);
 end
 
 %% ICA
@@ -28,10 +29,6 @@ for i_sub = sub_list
 EEG = EEG_ICA(i_sub);
 [EEG_withCFA(i_sub) EEG_noCFA(i_sub)] = Funct__RemoveArtifacts(EEG) 
 end
-
-%% Load pre-processed data
-load('EEG_withCFA.mat']);
-load('EEG_noCFA.mat']);
 
 %% ERPs: normal ERPs & UNFOLD ERPs
 for i_sub = sub_list
