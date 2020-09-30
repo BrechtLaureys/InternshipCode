@@ -1,0 +1,73 @@
+function [EEG_Rpeaks] = Funct__Find_RPeaks(EEG_orig, ECG_chann, remove_path, remove_file)
+% Function that identifies r-peaks in ECG data
+% When r-peaks are unclear, remove this data segment
+
+% Data
+EEG = EEG_orig;
+ECG = EEG.data(ECG_chann,:,:);%Select ECG
+
+% Calculate R-latencies
+[R_latency, valueRpeak] = functECG_ModPanTompkins_Max_Brecht(ECG, EEG.srate);
+
+% Plot data to check if R-peaks are ok?
+figure();
+plot(EEG.times/1000, ECG); %change from ms to s
+hold on; plot(R_latency/EEG.srate,valueRpeak,'xr'); %change from srate to s
+
+% Remove data if bad R-peaks
+ask_rem = input('\n Remove data with bad R-peaks using EEGLAB?(0=no/1=yes)'); %Remove data?
+close(gcf)
+
+if ask_rem == 1
+    while ask_rem == 1
+     
+        % Show the name under which to save data
+        input(['\n After removal, save data manually using the filename: ' remove_file]);
+        
+        % Open EEGLAB to reject
+        eeglab redraw;pop_eegplot(EEG);
+        
+        % Use rejected data?
+        input('Press to continue');
+        stop_rem = input('Did you remove data?(0=no/1=yes)');
+        
+        % Continue with original data
+        if stop_rem == 0
+            break;
+        end
+        
+        % Continue with modified data
+        if stop_rem == 1
+            EEG = pop_loadset('filename',remove_file,'filepath',remove_path);
+            ECG = EEG.data(ECG_chann,:,:);
+            
+            % Recalculate Rpeaks
+            [R_latency, valueRpeak] = functECG_ModPanTompkins_Max_Brecht(ECG, EEG.srate);
+            
+            % Check if ok
+            figure();
+            plot(EEG.times/1000, ECG); %change from ms to s
+            hold on; plot(R_latency/EEG.srate,valueRpeak,'xr'); %change from srate to s
+            
+            %Remove further data?
+            ask_rem = input('Remove further data?(0=no/1=yes)');
+            close(gcf)
+        end
+    end
+end
+
+% Add to structure
+n_rpeak = size(R_latency, 2);
+n_orig_events=size(EEG.event, 2);
+
+for i_rpeak = 1:n_rpeak
+        EEG.event(n_orig_events+i_rpeak) = struct('type', {'r_peak'}, 'value', [], 'latency', R_latency(1,i_rpeak), 'duration', 0, 'urevent', []);
+end
+
+% Output
+EEG_Rpeaks = EEG;
+
+
+
+
+
