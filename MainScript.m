@@ -1,7 +1,7 @@
 %% Basic variables
 map = 'C:\Users\brech\OneDrive\Documenten\Ugent\EXAMPLE__UNFOLD_LaserHEP'; %Change to your map
 cd 'C:\Users\brech\OneDrive\Documenten\Ugent\EXAMPLE__UNFOLD_LaserHEP' %Change to your map
-sub_list = [1:2];
+sub_list = [1:10];
 
 %% Load data
 for i_sub = sub_list % Load seperate data in single dataset
